@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>حاسبة دورات النوم الذكية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-text-size-adjust: 100%;
+        }
+        
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #7c3aed;
+            --accent: #06b6d4;
+            --dark: #0f172a;
+            --dark-light: #1e293b;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border-radius: 16px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+        }
+        
+        html {
+            font-size: 16px;
+            height: 100%;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: rgba(30, 41, 59, 0.95);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 25px 25px;
+            animation: float 20s linear infinite;
+            opacity: 0.3;
+        }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(-30px, -30px) rotate(360deg); }
+        }
+        
+        .app-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            line-height: 1.3;
+        }
+        
+        .header p {
+            font-size: 1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+            line-height: 1.5;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        .content {
+            padding: 25px;
+        }
+        
+        .input-section {
+            background-color: rgba(15, 23, 42, 0.8);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .time-input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+        
+        input[type="time"] {
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            background-color: rgba(30, 41, 59, 0.9);
+            color: white;
+            font-size: 1.1rem;
+            width: 100%;
+            transition: var(--transition);
+            direction: ltr;
+            text-align: center;
+        }
+        
+        input[type="time"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.3);
+        }
+        
+        .calculate-btn {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(to right, var(--primary-dark), #6d28d9);
+        }
+        
+        .results-container {
+            margin-top: 25px;
+            display: none;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .results-header h2 {
+            color: var(--accent);
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .reset-btn {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--light);
+            border: 1px solid var(--danger);
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .reset-btn:hover {
+            background-color: rgba(239, 68, 68, 0.4);
+        }
+        
+        .sleep-summary {
+            background: linear-gradient(145deg, rgba(6, 182, 212, 0.1), rgba(30, 41, 59, 0.9));
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 5px solid var(--accent);
+        }
+        
+        .sleep-summary h3 {
+            color: var(--accent);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .summary-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .summary-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        
+        .summary-value {
+            font-weight: bold;
+            color: #fbbf24;
+        }
+        
+        .cycles-container {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+        
+        .cycle-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+            border-radius: var(--border-radius);
+            padding: 20px;
+            border-left: 5px solid var(--primary);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cycle-card.best {
+            border-left-color: var(--success);
+            background: linear-gradient(145deg, rgba(16, 185, 129, 0.15), rgba(30, 41, 59, 0.95));
+        }
+        
+        .cycle-card.good {
+            border-left-color: var(--warning);
+        }
+        
+        .cycle-card.ok {
+            border-left-color: var(--gray);
+        }
+        
+        .cycle-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .cycle-title {
+            font-size: 1.3rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        .cycle-badge {
+            background-color: rgba(15, 23, 42, 0.8);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .cycle-time {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fbbf24;
+            margin: 15px 0;
+            text-align: center;
+            direction: ltr;
+            letter-spacing: 1px;
+        }
+        
+        .cycle-status {
+            color: var(--gray);
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            text-align: center;
+        }
+        
+        .sleep-stages {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stage-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 10px;
+            background-color: rgba(15, 23, 42, 0.5);
+        }
+        
+        .stage-item.active {
+            background-color: rgba(37, 99, 235, 0.2);
+            border: 1px solid rgba(37, 99, 235, 0.5);
+        }
+        
+        .stage-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .stage-icon.light {
+            background-color: rgba(96, 165, 250, 0.2);
+            color: #60a5fa;
+        }
+        
+        .stage-icon.deep {
+            background-color: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+        }
+        
+        .stage-icon.rem {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+        
+        .stage-info {
+            flex: 1;
+        }
+        
+        .stage-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .stage-duration {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .info-section {
+            background-color: rgba(6, 182, 212, 0.1);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 25px;
+            border-left: 5px solid var(--accent);
+        }
+        
+        .info-section h3 {
+            color: var(--accent);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .info-section ul {
+            padding-right: 20px;
+            line-height: 1.7;
+        }
+        
+        .info-section li {
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(15, 23, 42, 0.8);
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .cycle-time {
+                font-size: 1.8rem;
+            }
+            
+            .results-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .reset-btn {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="app-icon">💤</div>
+            <h1>حاسبة دورات النوم الذكية</h1>
+            <p>احسب أفضل أوقات الاستيقاظ بناءً على دورات النوم الطبيعية (90 دقيقة لكل دورة)</p>
+        </div>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="sleepTime"><i class="far fa-clock"></i> أدخل وقت النوم المتوقع</label>
+                    <div class="time-input-wrapper">
+                        <input type="time" id="sleepTime" value="22:30">
+                    </div>
+                </div>
+                
+                <button class="calculate-btn" onclick="calculateWakeUpTimes()">
+                    <i class="fas fa-calculator"></i> احسب أفضل أوقات الاستيقاظ
+                </button>
+            </div>
+            
+            <div id="results" class="results-container">
+                <div class="results-header">
+                    <h2><i class="fas fa-bed"></i> نتائج حساب النوم</h2>
+                    <button class="reset-btn" onclick="resetCalculator()">
+                        <i class="fas fa-redo"></i> إعادة الحساب
+                    </button>
+                </div>
+                
+                <!-- ملخص مراحل النوم -->
+                <div class="sleep-summary" id="sleepSummary">
+                    <h3><i class="fas fa-chart-bar"></i> ملخص مراحل النوم</h3>
+                    <div class="summary-item">
+                        <div class="summary-label">
+                            <i class="fas fa-moon" style="color: #60a5fa;"></i>
+                            <span>النوم الخفيف</span>
+                        </div>
+                        <div class="summary-value" id="lightSleepTime">--</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">
+                            <i class="fas fa-bed" style="color: #8b5cf6;"></i>
+                            <span>النوم العميق</span>
+                        </div>
+                        <div class="summary-value" id="deepSleepTime">--</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">
+                            <i class="fas fa-brain" style="color: #f59e0b;"></i>
+                            <span>نوم الأحلام (REM)</span>
+                        </div>
+                        <div class="summary-value" id="remSleepTime">--</div>
+                    </div>
+                </div>
+                
+                <!-- دورات النوم -->
+                <div class="cycles-container" id="cyclesContainer">
+                    <!-- سيتم إضافة دورات النوم هنا ديناميكيًا -->
+                </div>
+                
+                <div class="info-section">
+                    <h3><i class="fas fa-info-circle"></i> كيف تعمل حاسبة النوم؟</h3>
+                    <ul>
+                        <li>كل دورة نوم كاملة تستغرق 90 دقيقة وتتضمن 3 مراحل: النوم الخفيف، النوم العميق، ونوم حركة العين السريعة (الأحلام).</li>
+                        <li>في الدورة الأولى، تبدأ بالنوم الخفيف فقط.</li>
+                        <li>في الدورة الثانية، يضاف النوم العميق إلى الخفيف.</li>
+                        <li>من الدورة الثالثة، تظهر جميع مراحل النوم الثلاث.</li>
+                        <li>الاستيقاظ في نهاية دورة نوم كاملة يساعد على الشعور بالنشاط والانتعاش.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>حاسبة النوم الذكية - حساب دورات النوم الطبيعية © 2023</p>
+        </div>
+    </div>
+
+    <script>
+        // دالة لإعادة تعيين الحاسبة
+        function resetCalculator() {
+            document.getElementById('sleepTime').value = '22:30';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('cyclesContainer').innerHTML = '';
+            
+            // إعادة تعيين ملخص النوم
+            document.getElementById('lightSleepTime').textContent = '--';
+            document.getElementById('deepSleepTime').textContent = '--';
+            document.getElementById('remSleepTime').textContent = '--';
+            
+            // إرجاع التمرير للأعلى
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // دالة حساب أوقات الاستيقاظ
+        function calculateWakeUpTimes() {
+            const sleepInput = document.getElementById('sleepTime').value;
+            if (!sleepInput) {
+                alert("يرجى اختيار وقت النوم أولاً");
+                return;
+            }
+
+            const resultsDiv = document.getElementById('results');
+            const cyclesContainer = document.getElementById('cyclesContainer');
+            resultsDiv.style.display = 'block';
+            cyclesContainer.innerHTML = '';
+
+            const [hours, minutes] = sleepInput.split(':').map(Number);
+            let sleepDate = new Date();
+            sleepDate.setHours(hours, minutes, 0);
+
+            // إضافة 15 دقيقة كوقت افتراضي للدخول في النوم
+            sleepDate.setMinutes(sleepDate.getMinutes() + 15);
+            
+            // حساب مراحل النوم التراكمية لكل دورة
+            let totalLightSleep = 0;
+            let totalDeepSleep = 0;
+            let totalREMSleep = 0;
+
+            // حساب 6 دورات (من الدورة الأولى حتى السادسة)
+            for (let i = 1; i <= 6; i++) {
+                // إنشاء نسخة جديدة من التاريخ
+                let wakeDate = new Date(sleepDate.getTime());
+                wakeDate.setMinutes(wakeDate.getMinutes() + (i * 90));
+                
+                const wakeTime = wakeDate.toLocaleTimeString('ar-EG', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: true 
+                });
+                
+                // حساب مراحل النوم لكل دورة
+                let stages = calculateSleepStages(i);
+                
+                // تحديث المجاميع التراكمية
+                totalLightSleep += stages.light;
+                totalDeepSleep += stages.deep;
+                totalREMSleep += stages.rem;
+                
+                let status = "";
+                let cardClass = "";
+                
+                if (i < 3) {
+                    status = "نوم غير كافٍ للشعور بالراحة التامة";
+                    cardClass = "ok";
+                } else if (i === 3 || i === 4) {
+                    status = "نوم جيد - استيقاظ مثالي مع شعور بالانتعاش";
+                    cardClass = "good";
+                } else {
+                    status = "نوم ممتاز - استيقاظ نشيط مع طاقة عالية";
+                    cardClass = "best";
+                }
+
+                // حساب إجمالي ساعات النوم
+                const totalHours = (i * 1.5).toFixed(1);
+                
+                // إنشاء بطاقة الدورة
+                const cycleCard = document.createElement('div');
+                cycleCard.className = `cycle-card ${cardClass}`;
+                cycleCard.innerHTML = `
+                    <div class="cycle-header">
+                        <div class="cycle-title">دورة النوم ${i}</div>
+                        <div class="cycle-badge">${totalHours} ساعة</div>
+                    </div>
+                    <div class="cycle-time">${wakeTime}</div>
+                    <div class="cycle-status">${status}</div>
+                    <div class="sleep-stages">
+                        ${generateStageHTML(i)}
+                    </div>
+                `;
+                
+                cyclesContainer.appendChild(cycleCard);
+            }
+            
+            // تحديث ملخص النوم
+            updateSleepSummary(totalLightSleep, totalDeepSleep, totalREMSleep);
+            
+            // تمرير إلى قسم النتائج بسلاسة
+            setTimeout(() => {
+                resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
+        }
+        
+        // دالة لحساب مراحل النوم لكل دورة
+        function calculateSleepStages(cycleNumber) {
+            // نسب مراحل النوم التقريبية في كل دورة
+            // الدورة 1: خفيف فقط
+            // الدورة 2: خفيف + عميق
+            // الدورات 3-6: خفيف + عميق + أحلام
+            
+            let light = 0, deep = 0, rem = 0;
+            
+            if (cycleNumber === 1) {
+                // الدورة الأولى: كلها نوم خفيف
+                light = 90;
+            } else if (cycleNumber === 2) {
+                // الدورة الثانية: نوم خفيف وعميق
+                light = 50;
+                deep = 40;
+            } else {
+                // الدورات من 3 إلى 6: جميع المراحل
+                light = 30;
+                deep = 40;
+                rem = 20;
+            }
+            
+            return { light, deep, rem };
+        }
+        
+        // دالة لإنشاء HTML لمراحل النوم
+        function generateStageHTML(cycleNumber) {
+            let html = '';
+            
+            if (cycleNumber === 1) {
+                // الدورة الأولى: نوم خفيف فقط
+                html = `
+                    <div class="stage-item active">
+                        <div class="stage-icon light">
+                            <i class="fas fa-moon"></i>
+                        </div>
+                        <div class="stage-info">
+                            <div class="stage-name">نوم خفيف</div>
+                            <div class="stage-duration">تبدأ بالنوم الخفيف لمدة 90 دقيقة</div>
+                        </div>
+                    </div>
+                    <div class="stage-item">
+                        <div class="stage-icon deep">
+                            <i class="fas fa-bed"></i>
+                        </div>
+                        <div class="stage-info">
+                            <div class="stage-name">نوم عميق</div>
+                            <div class="stage-duration">لم تصل بعد لمرحلة النوم العميق</div>
+                        </div>
+                    </div>
+                    <div class="stage-item">
+                        <div class="stage-icon rem">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="stage-info">
+                            <div class="stage-name">نوم الأحلام</div>
+                            <div class="stage-duration">لم تصل بعد لمرحلة نوم الأحلام</div>
+                        </div>
+                    </div>
+                `;
+            } else if (cycleNumber === 2) {
+                // الدورة الثانية: نوم خفيف وعميق
+                html = `
+                    <div class="stage-item active">
+                        <div class="stage-icon light">
+                            <i class="fas fa-moon"></i>
+                        </div>
+                        <div class="stage-info">
+                            <div class="stage-name">نوم خفيف</div>
+                            <div class="stage-duration">50 دقيقة من النوم الخفيف</div>
+                        </div>
+                    </div>
+                    <div class="stage-item active">
+                        <div class="stage-icon deep">
+                            <i class="fas fa-bed"></i>
+                        </div>
+                        <div class="stage-info">
+                            <div class="stage-name">نوم عميق</div>
+                            <div class="stage-duration">40 دقيقة من النوم العميق</div>
+                        </div>
+                    </div>
+                    <div class="stage-item">
+                        <div class="stage-icon rem">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="stage-info">
+                            <div class="stage-name">نوم الأحلام</div>
+                            <div class="stage-duration">لم تصل بعد لمرحلة نوم الأحلام</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // الدورات من 3 إلى 6: جميع المراحل
+                html = `
+                    <div class="stage-item active">
+                        <div class="stage-icon light">
+                            <i class="fas fa-moon"></i>
+                        </div>
+                        <div class="stage-info">
+                            <div class="stage-name">نوم خفيف</div>
+                            <div class="stage-duration">30 دقيقة من النوم الخفيف</div>
+                        </div>
+                    </div>
+                    <div class="stage-item active">
+                        <div class="stage-icon deep">
+                            <i class="fas fa-bed"></i>
+                        </div>
+                        <div class="stage-info">
+                            <div class="stage-name">نوم عميق</div>
+                            <div class="stage-duration">40 دقيقة من النوم العميق</div>
+                        </div>
+                    </div>
+                    <div class="stage-item active">
+                        <div class="stage-icon rem">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="stage-info">
+                            <div class="stage-name">نوم الأحلام</div>
+                            <div class="stage-duration">20 دقيقة من نوم الأحلام</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            return html;
+        }
+        
+        // دالة لتحديث ملخص النوم
+        function updateSleepSummary(light, deep, rem) {
+            // تحويل الدقائق إلى ساعات ودقائق
+            const formatTime = (minutes) => {
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                return `${hours} ساعة و ${mins} دقيقة`;
+            };
+            
+            document.getElementById('lightSleepTime').textContent = formatTime(light);
+            document.getElementById('deepSleepTime').textContent = formatTime(deep);
+            document.getElementById('remSleepTime').textContent = formatTime(rem);
+        }
+        
+        // حساب تلقائي عند تحميل الصفحة
+        window.onload = function() {
+            setTimeout(() => {
+                calculateWakeUpTimes();
+            }, 500);
+        };
+    </script>
+<script>
+    // تسجيل الـ Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('تم تسجيل الخدمة بنجاح!'))
+                .catch(err => console.log('فشل تسجيل الخدمة:', err));
+        });
+    }
+</script>
+</body>
+</html>
